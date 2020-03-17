@@ -63,6 +63,7 @@ float duration = 10;
 float phase = 0;
 float phase_ms = 0;
 float inactive_time = 0;
+float mode = 2;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -468,7 +469,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 		d1 = d2;
 		d2 = d3;
 		d3 = (adcValue[0] - NormalizeParameter[0])/ NormalizeParameter[1];
-		if(d2 > threshold/100.0f && d1 < d2 && d2 > d3 && tim2_count > 100 && tim2_count > inactive_time){ //peak detect
+		if(d2 > threshold/100.0f && d1 < d2 && d2 > d3 && tim2_count > 100 && tim2_count > inactive_time && ((int)mode % 2) == 0){ //peak detect
+			//HAL_GPIO_WritePin(LD2_GPIO_Port,LD2_Pin,SET);
+			tim2_count = 0;
+			phase_flag = 1;
+			phase_tim = 0;
+
+		}else if(d2 < threshold/100.0f && d1 > d2 && d2 < d3 && tim2_count > 100 && tim2_count > inactive_time && ((int)mode % 2) == 1){ //trough detect
 			//HAL_GPIO_WritePin(LD2_GPIO_Port,LD2_Pin,SET);
 			tim2_count = 0;
 			phase_flag = 1;
@@ -523,6 +530,10 @@ void DrawParameter(int count){
 
 	ssd1306_SetCursor(0,36);
 	sprintf(buf,"%sinactive=%d [sec]",count==3?"*":" ", (int)inactive_time);
+	ssd1306_WriteString(buf,Font_7x10,Black);
+
+	ssd1306_SetCursor(0,48);
+	sprintf(buf,"%smode=%s ",count==4?"*":" ",  ((int)mode % 2) == 1 ? "trough":"peak");
 	ssd1306_WriteString(buf,Font_7x10,Black);
 
 	ssd1306_UpdateScreen();
@@ -590,6 +601,10 @@ void UserSetUp(void){
 					break;
 				case 3:
 					param_pointer = &inactive_time;
+					DrawParameter(count);
+					break;
+				case 4:
+					param_pointer = &mode;
 					DrawParameter(count);
 					break;
 				default:

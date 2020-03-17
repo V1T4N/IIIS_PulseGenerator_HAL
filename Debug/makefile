@@ -32,6 +32,9 @@ default.size.stdout \
 OBJDUMP_LIST += \
 CLF_test.list \
 
+OBJCOPY_BIN += \
+CLF_test.bin \
+
 
 # All Target
 all: CLF_test.elf secondary-outputs
@@ -52,12 +55,17 @@ CLF_test.list: $(EXECUTABLES)
 	@echo 'Finished building: $@'
 	@echo ' '
 
+CLF_test.bin: $(EXECUTABLES)
+	arm-none-eabi-objcopy  -O binary $(EXECUTABLES) "CLF_test.bin"
+	@echo 'Finished building: $@'
+	@echo ' '
+
 # Other Targets
 clean:
 	-$(RM) *
 	-@echo ' '
 
-secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
+secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST) $(OBJCOPY_BIN)
 
 .PHONY: all clean dependents
 .SECONDARY:
