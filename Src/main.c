@@ -176,11 +176,13 @@ int main(void)
 		  if(HAL_GPIO_ReadPin(GPIOB, FOOT_SW_Pin) == 0){
 			  HAL_TIM_Base_Stop_IT(&htim2); //stop timer interrupt
 			  HAL_Delay(300);
+			  HAL_GPIO_WritePin(LD2_GPIO_Port,LD2_Pin,RESET);
 			  goto RESTART_LABEL;
 		  }
 	  }else if(HAL_GPIO_ReadPin(GPIOB, RIGHT_B_Pin) == 0){
 		  HAL_TIM_Base_Stop_IT(&htim2); //stop timer interrupt
 		  HAL_Delay(300);
+		  HAL_GPIO_WritePin(LD2_GPIO_Port,LD2_Pin,RESET);
 		  goto STARTUP_LABEL;
 	 }
   }
@@ -529,7 +531,7 @@ void DrawParameter(int count){
 	ssd1306_WriteString(buf,Font_7x10,Black);
 
 	ssd1306_SetCursor(0,36);
-	sprintf(buf,"%sinactive=%d [sec]",count==3?"*":" ", (int)inactive_time);
+	sprintf(buf,"%sinactive=%d [ms]",count==3?"*":" ", (int)inactive_time);
 	ssd1306_WriteString(buf,Font_7x10,Black);
 
 	ssd1306_SetCursor(0,48);
